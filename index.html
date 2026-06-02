@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FBAPS — French Banking AI Perception Study</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+:root{
+  --bg:#ffffff; --bg2:#faf8ff; --wash1:#f3eeff; --wash2:#fdf0ea;
+  --panel:#ffffff; --panel2:#f7f5fc; --ink:#26035D; --body:#3C4043; --dim:#6b6f7a;
+  --faint:#a9adb8; --line:#ece9f3; --line2:#e4e0ee;
+  --violet:#836FFF; --violet-d:#6a54f0; --indigo:#26035D; --mint:#16c08a; --mint-soft:#e6f7f0;
+  --hot:#ff5c7a; --amber:#e8930c;
+  --shadow:0 4px 24px rgba(38,3,93,.06); --shadow-lg:0 12px 40px rgba(38,3,93,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--body);font-family:'DM Sans',sans-serif;line-height:1.6;
+  background-image:radial-gradient(ellipse at 12% 0%,var(--wash1),transparent 45%),radial-gradient(ellipse at 95% 100%,var(--wash2),transparent 40%);
+  background-attachment:fixed;}
+.mono{font-family:'DM Sans',sans-serif;font-feature-settings:"tnum"}
+.wrap{display:flex;min-height:100vh}
+/* NAV */
+nav{width:248px;flex-shrink:0;border-right:1px solid var(--line);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;background:rgba(255,255,255,.7);backdrop-filter:blur(10px)}
+.brand{padding:0 26px 24px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.brand .logo svg{height:26px;width:auto;display:block}
+.brand .sub{font-size:9.5px;letter-spacing:2.2px;text-transform:uppercase;color:var(--faint);margin-top:11px;font-weight:600}
+.navsec{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);padding:18px 26px 8px;font-weight:600}
+nav a{display:block;padding:9px 26px;color:var(--dim);text-decoration:none;font-size:14px;font-weight:500;border-left:2px solid transparent;transition:.15s;cursor:pointer}
+nav a:hover{color:var(--ink);background:var(--wash1)}
+nav a.active{color:var(--violet);border-left-color:var(--violet);background:var(--wash1);font-weight:600}
+.modelpick{display:flex;gap:6px;padding:12px 22px 0}
+.modelpick button{flex:1;background:#fff;border:1px solid var(--line2);color:var(--dim);
+  font-family:'DM Sans';font-weight:600;font-size:12px;padding:8px;border-radius:9px;cursor:pointer;transition:.15s}
+.modelpick button:hover{border-color:var(--violet)}
+.modelpick button.on{background:var(--violet);border-color:var(--violet);color:#fff;box-shadow:0 4px 12px rgba(131,111,255,.3)}
+/* MAIN */
+main{flex:1;padding:54px 64px;max-width:1120px}
+.page{display:none;animation:fade .45s ease}
+.page.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-family:'DM Sans',sans-serif;font-weight:700;font-size:48px;line-height:1.05;letter-spacing:-1.6px;margin-bottom:10px;color:var(--ink)}
+h1 em{font-style:italic;color:var(--violet);font-weight:700}
+h2{font-weight:700;font-size:28px;letter-spacing:-.6px;margin:42px 0 16px;color:var(--ink)}
+h3{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--violet);margin:34px 0 12px;font-weight:700;
+  display:inline-block;border:1px solid var(--line2);border-radius:6px;padding:5px 11px;background:#fff}
+p{color:var(--body);max-width:690px;margin-bottom:14px}
+.lede{font-size:18px;line-height:1.6;color:var(--body);max-width:730px;margin:18px 0 8px}
+.lede strong{color:var(--ink);font-weight:600}
+.tag{display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1.2px;color:var(--ink);font-weight:600;
+  background:#fff;border:1px solid var(--line2);border-radius:30px;padding:6px 15px 6px 13px;margin-bottom:22px;text-transform:uppercase;box-shadow:var(--shadow)}
+.tag::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--violet)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;position:relative;box-shadow:var(--shadow);overflow:hidden}
+.stat::after{content:'';position:absolute;top:14px;right:14px;width:14px;height:14px;border-top:2px solid var(--violet);border-right:2px solid var(--violet);opacity:.45}
+.stat .n{font-weight:700;font-size:42px;color:var(--violet);line-height:1;letter-spacing:-1px}
+.stat .l{font-size:13px;color:var(--dim);margin-top:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;margin:18px 0;box-shadow:var(--shadow)}
+.steps{counter-reset:s}
+.step{display:flex;gap:18px;padding:17px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border:0}
+.step .num{counter-increment:s;font-weight:700;font-size:13px;color:var(--violet);flex-shrink:0;width:30px}
+.step .num::before{content:counter(s,decimal-leading-zero)}
+.step .t{font-weight:600;color:var(--ink);margin-bottom:3px;font-size:15px}
+.step .d{font-size:14px;color:var(--dim)}
+/* RANK BARS */
+.bar{display:flex;align-items:center;gap:14px;margin:7px 0;font-size:14px}
+.bar .nm{width:170px;flex-shrink:0;text-align:right;color:var(--ink);font-weight:500}
+.bar .track{flex:1;height:22px;background:var(--panel2);border-radius:6px;overflow:hidden;position:relative}
+.bar .fill{height:100%;background:linear-gradient(90deg,var(--violet),#a99cff);border-radius:6px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.bar .pct{font-family:'DM Sans';font-weight:600;font-size:12px;color:var(--dim);width:48px}
+/* HEATMAP */
+.hmwrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow)}
+.controls{display:flex;gap:10px;align-items:center;margin:16px 0;flex-wrap:wrap}
+.controls button{background:#fff;border:1px solid var(--line2);color:var(--dim);font-family:'DM Sans';font-weight:600;
+  font-size:12px;padding:8px 14px;border-radius:9px;cursor:pointer;transition:.15s}
+.controls button:hover{border-color:var(--violet);color:var(--violet)}
+.legend{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--dim);margin-left:auto;font-weight:500}
+.legbar{width:120px;height:10px;border-radius:3px;background:linear-gradient(90deg,#f3f1fb,var(--violet),var(--indigo))}
+table.hm{border-collapse:collapse;font-size:12px}
+table.hm th{font-weight:600;color:var(--dim);padding:8px;text-align:center;font-size:10px;letter-spacing:.3px;position:sticky;vertical-align:bottom}
+table.hm th.rowh{text-align:right;padding-right:14px;color:var(--ink);font-size:13px;font-weight:500;min-width:150px;position:sticky;left:0;background:#fff;z-index:2}
+table.hm thead th{top:0;background:#fff;z-index:1;height:92px}
+table.hm thead th .rot{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;margin:0 auto}
+.cell{width:54px;height:42px;text-align:center;font-family:'DM Sans';font-weight:600;font-size:12px;cursor:default;
+  border:2px solid #fff;position:relative;transition:.1s;border-radius:3px}
+.cell:hover{outline:2px solid var(--ink);outline-offset:-2px;z-index:3}
+.cell.peak::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;border-radius:50%;background:var(--mint)}
+.tip{position:fixed;background:var(--ink);color:#fff;border-radius:10px;padding:10px 14px;
+  font-size:12px;pointer-events:none;opacity:0;transition:.12s;z-index:99;max-width:240px;box-shadow:var(--shadow-lg)}
+.tip .tb{color:#b9a9ff;font-weight:700}
+/* findings */
+.find{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.find:last-child{border:0}
+.find .ic{font-weight:700;font-size:26px;flex-shrink:0;width:40px;line-height:1.2}
+.find.ws .ic{color:var(--amber)} .find.mono .ic{color:var(--mint)} .find.con .ic{color:var(--violet)}
+.find .ft{font-weight:600;font-size:16px;margin-bottom:4px;color:var(--ink)}
+.find .fd{font-size:14px;color:var(--dim);max-width:640px}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--wash1);color:var(--violet);margin:2px}
+.chip.ws{background:#fdf0e0;color:var(--amber)}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <div class="brand"><div class="logo"><svg xmlns="http://www.w3.org/2000/svg" width="152" height="24" viewBox="0 0 152 24" fill="none"><path d="M0 1.39421C0 0.779463 0.498355 0.281107 1.11311 0.281107H14.0388C14.7615 0.281107 15.2926 0.959098 15.1195 1.66078L12.7172 11.4004C12.5946 11.8976 12.1486 12.247 11.6365 12.247H1.11311C0.498355 12.247 0 11.7486 0 11.1339V1.39421Z" fill="#836FFF"></path><path d="M22.7681 21.7083C22.7681 22.3231 22.2697 22.8214 21.655 22.8214L14.0286 22.8214C13.3038 22.8214 12.7723 22.1397 12.9491 21.4368L18.059 1.12264C18.1834 0.627885 18.6283 0.281067 19.1385 0.281067L21.655 0.281067C22.2697 0.281067 22.7681 0.779421 22.7681 1.39417L22.7681 21.7083Z" fill="#836FFF"></path><path d="M0 16.1428C0 15.5281 0.498355 15.0297 1.11311 15.0297H10.3832C11.1063 15.0297 11.6375 15.7085 11.4636 16.4105L10.0849 21.976C9.96184 22.4727 9.51608 22.8215 9.00443 22.8215H1.11311C0.498355 22.8215 0 22.3231 0 21.7084V16.1428Z" fill="#836FFF"></path><path d="M146.982 22.8215C145.932 22.8215 145.112 22.5478 144.522 22.0006C143.933 21.4533 143.638 20.6232 143.638 19.5104V9.57736H140.984V6.40315H143.665V1.47765H147.59V6.40315H151.156V9.57736H147.646V19.6473H151.515V22.8215H146.982Z" fill="#26035D"></path><path d="M123.296 22.8215V6.40315H127.193V8.89326H127.304C127.783 7.99938 128.446 7.31528 129.294 6.84097C130.16 6.34842 131.155 6.10215 132.279 6.10215C133.495 6.10215 134.555 6.39403 135.458 6.97779C136.379 7.56156 137.098 8.36423 137.614 9.38581C138.13 10.4074 138.387 11.584 138.387 12.9158V22.8215H134.38V13.6819C134.38 12.4414 134.066 11.4746 133.44 10.7814C132.813 10.0699 131.947 9.71418 130.842 9.71418C129.755 9.71418 128.888 10.0699 128.244 10.7814C127.617 11.4746 127.304 12.4414 127.304 13.6819V22.8215H123.296Z" fill="#26035D"></path><path d="M114.832 22.8215V6.40315H118.84V22.8215H114.832ZM116.822 4.59713C116.177 4.59713 115.625 4.37822 115.164 3.9404C114.722 3.48433 114.5 2.93705 114.5 2.29856C114.5 1.66007 114.722 1.12192 115.164 0.684096C115.625 0.228032 116.177 0 116.822 0C117.467 0 118.011 0.228032 118.453 0.684096C118.914 1.12192 119.144 1.66007 119.144 2.29856C119.144 2.93705 118.914 3.48433 118.453 3.9404C118.011 4.37822 117.467 4.59713 116.822 4.59713Z" fill="#26035D"></path><path d="M86.3447 22.8215V0.656738H91.9281L98.0642 16.993H98.1748L104.283 0.656738H109.839V22.8215H105.748V6.2937H105.638L99.6673 22.8215H96.2399L90.2973 6.26633H90.1867V22.8215H86.3447Z" fill="#26035D"></path><path d="M78.3783 22.8215C77.328 22.8215 76.508 22.5478 75.9183 22.0006C75.3287 21.4533 75.0338 20.6232 75.0338 19.5104V9.57736H72.3804V6.40315H75.0615V1.47765H78.9864V6.40315H82.552V9.57736H79.0417V19.6473H82.9113V22.8215H78.3783Z" fill="#26035D"></path><path d="M63.2208 23.1498C61.6729 23.1498 60.2909 22.8032 59.0747 22.11C57.877 21.3986 56.928 20.4043 56.2278 19.1273C55.546 17.8321 55.2051 16.3089 55.2051 14.5576C55.2051 12.8245 55.5368 11.3286 56.2001 10.0699C56.8819 8.79293 57.8125 7.80783 58.9918 7.11461C60.1711 6.42139 61.5255 6.07478 63.0549 6.07478C64.4922 6.07478 65.7729 6.39403 66.8969 7.03252C68.021 7.65277 68.9147 8.5649 69.578 9.76891C70.2414 10.9729 70.5731 12.4232 70.5731 14.1198V15.57H59.13C59.2774 16.92 59.7104 17.9781 60.4291 18.7443C61.1662 19.4922 62.0875 19.8662 63.1931 19.8662C64.0408 19.8662 64.741 19.6655 65.2938 19.2642C65.865 18.8628 66.252 18.3156 66.4547 17.6223H70.5454C70.3243 18.7716 69.8636 19.7658 69.1634 20.605C68.4816 21.4259 67.6248 22.0553 66.5929 22.4931C65.5794 22.9309 64.4554 23.1498 63.2208 23.1498ZM59.2406 12.8063H66.6482C66.5192 11.6753 66.123 10.8179 65.4596 10.2341C64.8147 9.63209 64.0131 9.33108 63.0549 9.33108C62.0967 9.33108 61.2767 9.63209 60.5949 10.2341C59.9316 10.8361 59.4801 11.6935 59.2406 12.8063Z" fill="#26035D"></path><path d="M41.9664 23.1498C40.0132 23.1498 38.2811 22.6664 36.77 21.6996C35.2775 20.7145 34.1074 19.3645 33.2597 17.6497C32.4121 15.9349 31.9883 13.9738 31.9883 11.7665C31.9883 9.50439 32.4305 7.51595 33.315 5.80114C34.1995 4.08634 35.4249 2.74551 36.9912 1.77865C38.5759 0.811797 40.4001 0.328369 42.4639 0.328369C44.1224 0.328369 45.6057 0.647615 46.914 1.2861C48.2408 1.90635 49.3279 2.79112 50.1756 3.9404C51.0232 5.07144 51.5484 6.40315 51.7511 7.93553H47.4945C47.3102 6.74976 46.7666 5.80114 45.8637 5.08968C44.9608 4.35998 43.8275 3.99513 42.4639 3.99513C41.1925 3.99513 40.0777 4.3235 39.1195 4.98023C38.1613 5.61872 37.415 6.52173 36.8806 7.68925C36.3647 8.85678 36.1067 10.225 36.1067 11.7938C36.1067 13.3445 36.3739 14.7218 36.9082 15.9258C37.4426 17.1115 38.1889 18.0419 39.1471 18.7169C40.1237 19.3736 41.2478 19.702 42.5192 19.702C43.5327 19.702 44.4264 19.5196 45.2003 19.1547C45.9927 18.7899 46.61 18.2882 47.0522 17.6497C47.5129 16.993 47.7432 16.2724 47.7432 15.488V14.4755H42.1323V11.2192H48.6554C49.6873 11.2192 50.4612 11.4837 50.9771 12.0127C51.4931 12.5235 51.7511 13.2806 51.7511 14.2839V22.8215H47.992V20.0304H47.8814C47.4023 20.9972 46.6468 21.7634 45.6149 22.3289C44.6015 22.8762 43.3853 23.1498 41.9664 23.1498Z" fill="#26035D"></path></svg></div><div class="sub">Banking · AI · Perception Study</div></div>
+  <div class="modelpick">
+    <button id="mb-gemini" class="on" onclick="setModel('gemini')">Gemini</button>
+    <button id="mb-openai" onclick="setModel('openai')">GPT-4o</button>
+  </div>
+  <div class="modelpick" style="padding-top:8px">
+    <button id="lb-en" class="on" onclick="setLang('en')">EN</button>
+    <button id="lb-fr" onclick="setLang('fr')">FR</button>
+  </div>
+  <div class="navsec" data-k="nav_study">Study</div>
+  <a class="active" data-k="nav_overview" onclick="go('intro',this)">Overview</a>
+  <a data-k="nav_method" onclick="go('method',this)">Methodology</a>
+  <div class="navsec" data-k="nav_findings">Findings</div>
+  <a data-k="nav_recall" onclick="go('recall',this)">Layer 1 · Recall</a>
+  <a data-k="nav_matrix" onclick="go('matrix',this)">Layer 2 · Territory Map</a>
+  <a data-k="nav_ws" onclick="go('whitespace',this)">White Space</a>
+  <a data-k="nav_insights" onclick="go('insights',this)">Key Findings</a>
+</nav>
+<main>
+  <!-- INTRO -->
+  <section class="page show" id="intro">
+    <div class="tag" id="introtag">Gemini 2.0 Flash</div>
+    <h1 id="t_introh"><em>placeholder</em></h1>
+    <p class="lede" id="t_introlede"></p>
+    <div class="grid3">
+      <div class="stat"><div class="n" id="s-calls">—</div><div class="l" id="t_s1"></div></div>
+      <div class="stat"><div class="n" id="s-banks">—</div><div class="l" id="t_s2"></div></div>
+      <div class="stat"><div class="n">10</div><div class="l" id="t_s3"></div></div>
+    </div>
+    <p id="t_introbody"></p>
+  </section>
+  <!-- METHOD -->
+  <section class="page" id="method">
+    <h1 id="t_mh"></h1>
+    <p class="lede" id="t_mlede"></p>
+    <h3 id="t_mpipe"></h3>
+    <div class="card steps" id="t_steps">
+      <div class="step"><div class="num"></div><div><div class="t">Layer 1 · Unaided recall</div><div class="d">500 identical calls per model: "List every French bank you know." Establishes parametric share of mind and defines each model's bank universe.</div></div></div>
+      <div class="step"><div class="num"></div><div><div class="t">Universe selection</div><div class="d">Each model's universe = its own top-recalled banks. Sizes differ by design — Gemini 10, GPT-4o 20 — because the models hold different depths of knowledge. That asymmetry is itself a finding.</div></div></div>
+      <div class="step"><div class="num"></div><div><div class="t">Layer 2 · Territory association</div><div class="d">One bank per prompt, 50 calls per bank: "Pick the top 3 service categories you associate with this bank." Near-100% parse success, no truncation.</div></div></div>
+      <div class="step"><div class="num"></div><div><div class="t">Matrix &amp; analysis</div><div class="d">Association score 0–100 per bank × service = share of the 50 calls assigning that territory. Surfaces monopolies, contested zones, and white space.</div></div></div>
+    </div>
+    <h3 id="t_mnote"></h3>
+    <p id="t_mnotebody"></p>
+  </section>
+  <!-- RECALL -->
+  <section class="page" id="recall">
+    <h1 id="t_rh"></h1>
+    <p class="lede" id="t_rlede"></p>
+    <div class="card" id="recallbars"></div>
+  </section>
+  <!-- MATRIX -->
+  <section class="page" id="matrix">
+    <h1 id="t_xh"></h1>
+    <p class="lede" id="t_xlede"></p>
+
+    <h3 id="t_xhm"></h3>
+    <p style="margin-bottom:18px" id="t_xhmd"></p>
+    <div class="controls">
+      <button onclick="zoomHM(1)">Zoom +</button>
+      <button onclick="zoomHM(-1)">Zoom −</button>
+      <button onclick="zoomHM(0)">Reset</button>
+      <button onclick="sortHM()" id="t_sortbtn"></button>
+      <div class="legend"><span>0</span><div class="legbar"></div><span>100</span></div>
+    </div>
+    <div class="hmwrap"><div id="hm"></div></div>
+
+    <h3 style="margin-top:48px" id="t_xc"></h3>
+    <p style="margin-bottom:18px" id="t_xcd"></p>
+    <div class="controls">
+      <span class="mono" style="font-size:12px;color:var(--dim)" id="t_thr"></span>
+      <input type="range" id="thr" min="20" max="90" value="50" step="5" style="width:160px;accent-color:var(--violet)">
+      <span class="mono" id="thrval" style="font-size:13px;color:var(--violet);width:42px;font-weight:600">≥50%</span>
+      <button onclick="restartSim()" id="t_resettle"></button>
+      <span class="legend mono" style="font-size:11px"><span style="color:var(--violet)">● bank</span> &nbsp; <span style="color:var(--indigo)">◆ territory</span></span>
+    </div>
+    <div class="hmwrap" style="background:radial-gradient(circle at 50% 40%,#faf8ff,#f3eeff);position:relative">
+      <canvas id="net" width="1000" height="620" style="width:100%;display:block"></canvas>
+    </div>
+  </section>
+  <!-- WHITESPACE -->
+  <section class="page" id="whitespace">
+    <h1 id="t_wh"></h1>
+    <p class="lede" id="t_wlede"></p>
+    <div class="card" id="wsbars"></div>
+  </section>
+  <!-- INSIGHTS -->
+  <section class="page" id="insights">
+    <h1 id="t_ih"></h1>
+    <p class="lede" id="inslede"></p>
+    <div class="card" id="findings"></div>
+  </section>
+  <footer>FBAPS · GetMint.ai GEO Intelligence · Layer 1: 500 calls/model · Layer 2: 50 calls/bank · temp 0.2 · methodology derived from FLBAI 2025</footer>
+</main>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+const FBAPS_DATA = {"services": ["Mortgage / Real estate financing", "Youth banking", "SME / Professional banking", "Savings & investment", "Digital / Mobile banking", "Green / Sustainable finance", "Private banking / Wealth management", "Consumer credit", "Insurance & bancassurance", "International / Expat banking"], "services_short": ["Mortgage", "Youth", "SME/Pro", "Savings", "Digital", "Green", "Private/Wealth", "Consumer credit", "Insurance", "International"], "models": {"gemini": {"banks": ["BNP Paribas", "Société Générale", "Crédit Agricole", "LCL", "Caisse d'Épargne", "Banque Populaire", "Crédit Mutuel", "CIC", "La Banque Postale", "BPCE"], "matrix": [[16, 0, 58, 14, 0, 32, 94, 0, 28, 58], [10, 0, 98, 34, 2, 0, 76, 2, 20, 58], [98, 0, 96, 0, 0, 6, 0, 0, 100, 0], [100, 0, 40, 88, 0, 0, 0, 4, 68, 0], [100, 8, 2, 100, 0, 0, 0, 8, 82, 0], [94, 0, 100, 64, 0, 0, 0, 0, 42, 0], [80, 0, 88, 30, 2, 0, 0, 0, 100, 0], [68, 0, 100, 18, 0, 0, 14, 0, 100, 0], [10, 30, 0, 100, 0, 4, 0, 56, 100, 0], [100, 0, 98, 100, 0, 0, 0, 0, 2, 0]], "recall": {"BNP Paribas": 96.7, "Société Générale": 96.1, "Crédit Agricole": 94.6, "LCL": 61.9, "Caisse d'Épargne": 56.3, "Banque Populaire": 55.9, "Crédit Mutuel": 51.3, "CIC": 28.4, "La Banque Postale": 17.2, "BPCE": 7.7}, "primary": {"BNP Paribas": "Private banking / Wealth management", "Société Générale": "SME / Professional banking", "Crédit Agricole": "Insurance & bancassurance", "LCL": "Mortgage / Real estate financing", "Caisse d'Épargne": "Mortgage / Real estate financing", "Banque Populaire": "SME / Professional banking", "Crédit Mutuel": "Insurance & bancassurance", "CIC": "SME / Professional banking", "La Banque Postale": "Savings & investment", "BPCE": "Mortgage / Real estate financing"}, "services_info": [{"service": "Mortgage / Real estate financing", "peak": 100, "owner": "LCL", "whitespace": false, "top3": [["LCL", 100], ["Caisse d'Épargne", 100], ["BPCE", 100]]}, {"service": "Youth banking", "peak": 30, "owner": "La Banque Postale", "whitespace": false, "top3": [["La Banque Postale", 30], ["Caisse d'Épargne", 8], ["BNP Paribas", 0]]}, {"service": "SME / Professional banking", "peak": 100, "owner": "Banque Populaire", "whitespace": false, "top3": [["Banque Populaire", 100], ["CIC", 100], ["Société Générale", 98]]}, {"service": "Savings & investment", "peak": 100, "owner": "Caisse d'Épargne", "whitespace": false, "top3": [["Caisse d'Épargne", 100], ["La Banque Postale", 100], ["BPCE", 100]]}, {"service": "Digital / Mobile banking", "peak": 2, "owner": "Société Générale", "whitespace": true, "top3": [["Société Générale", 2], ["Crédit Mutuel", 2], ["BNP Paribas", 0]]}, {"service": "Green / Sustainable finance", "peak": 32, "owner": "BNP Paribas", "whitespace": false, "top3": [["BNP Paribas", 32], ["Crédit Agricole", 6], ["La Banque Postale", 4]]}, {"service": "Private banking / Wealth management", "peak": 94, "owner": "BNP Paribas", "whitespace": false, "top3": [["BNP Paribas", 94], ["Société Générale", 76], ["CIC", 14]]}, {"service": "Consumer credit", "peak": 56, "owner": "La Banque Postale", "whitespace": false, "top3": [["La Banque Postale", 56], ["Caisse d'Épargne", 8], ["LCL", 4]]}, {"service": "Insurance & bancassurance", "peak": 100, "owner": "Crédit Agricole", "whitespace": false, "top3": [["Crédit Agricole", 100], ["Crédit Mutuel", 100], ["CIC", 100]]}, {"service": "International / Expat banking", "peak": 58, "owner": "BNP Paribas", "whitespace": false, "top3": [["BNP Paribas", 58], ["Société Générale", 58], ["Crédit Agricole", 0]]}], "universe_size": 10}, "openai": {"banks": ["Société Générale", "LCL", "Monabanq", "La Banque Postale", "Orange Bank", "Crédit Agricole", "BNP Paribas", "Crédit Mutuel", "N26", "Boursorama", "Nickel", "Hello bank!", "Caisse d'Épargne", "Banque Populaire", "ING France", "Fortuneo", "AXA Banque", "Revolut", "HSBC France", "CIC"], "matrix": [[0, 0, 98, 90, 58, 0, 18, 10, 14, 12], [70, 0, 10, 28, 8, 0, 0, 96, 88, 0], [0, 0, 0, 100, 100, 0, 0, 100, 0, 0], [2, 0, 0, 100, 6, 0, 0, 94, 98, 0], [0, 0, 0, 88, 100, 0, 0, 100, 12, 0], [68, 0, 62, 66, 0, 2, 0, 2, 100, 0], [0, 0, 10, 94, 42, 48, 68, 0, 6, 32], [4, 0, 94, 34, 12, 0, 0, 56, 100, 0], [0, 62, 30, 8, 100, 0, 0, 0, 0, 100], [0, 0, 0, 100, 100, 0, 0, 100, 0, 0], [0, 100, 4, 0, 100, 0, 0, 96, 0, 0], [0, 100, 0, 70, 100, 0, 0, 30, 0, 0], [80, 0, 6, 100, 0, 0, 0, 60, 54, 0], [30, 0, 100, 94, 0, 0, 0, 58, 18, 0], [0, 0, 0, 100, 100, 0, 0, 82, 4, 14], [0, 0, 0, 100, 100, 0, 0, 0, 100, 0], [0, 0, 0, 100, 88, 0, 0, 12, 100, 0], [0, 0, 16, 84, 100, 0, 0, 0, 0, 100], [0, 0, 92, 8, 0, 0, 100, 0, 0, 100], [0, 0, 100, 74, 14, 0, 8, 4, 100, 0]], "recall": {"Société Générale": 100.0, "LCL": 100.0, "Monabanq": 100.0, "La Banque Postale": 100.0, "Orange Bank": 100.0, "Crédit Agricole": 100.0, "BNP Paribas": 100.0, "Crédit Mutuel": 100.0, "N26": 100.0, "Boursorama": 99.8, "Nickel": 99.4, "Hello bank!": 99.4, "Caisse d'Épargne": 98.0, "Banque Populaire": 98.0, "ING France": 97.2, "Fortuneo": 96.4, "AXA Banque": 96.4, "Revolut": 95.0, "HSBC France": 94.4, "CIC": 79.4}, "primary": {"Société Générale": "SME / Professional banking", "LCL": "Consumer credit", "Monabanq": "Savings & investment", "La Banque Postale": "Savings & investment", "Orange Bank": "Digital / Mobile banking", "Crédit Agricole": "Insurance & bancassurance", "BNP Paribas": "Savings & investment", "Crédit Mutuel": "Insurance & bancassurance", "N26": "Digital / Mobile banking", "Boursorama": "Savings & investment", "Nickel": "Youth banking", "Hello bank!": "Youth banking", "Caisse d'Épargne": "Savings & investment", "Banque Populaire": "SME / Professional banking", "ING France": "Savings & investment", "Fortuneo": "Savings & investment", "AXA Banque": "Savings & investment", "Revolut": "Digital / Mobile banking", "HSBC France": "Private banking / Wealth management", "CIC": "SME / Professional banking"}, "services_info": [{"service": "Mortgage / Real estate financing", "peak": 80, "owner": "Caisse d'Épargne", "whitespace": false, "top3": [["Caisse d'Épargne", 80], ["LCL", 70], ["Crédit Agricole", 68]]}, {"service": "Youth banking", "peak": 100, "owner": "Nickel", "whitespace": false, "top3": [["Nickel", 100], ["Hello bank!", 100], ["N26", 62]]}, {"service": "SME / Professional banking", "peak": 100, "owner": "Banque Populaire", "whitespace": false, "top3": [["Banque Populaire", 100], ["CIC", 100], ["Société Générale", 98]]}, {"service": "Savings & investment", "peak": 100, "owner": "Monabanq", "whitespace": false, "top3": [["Monabanq", 100], ["La Banque Postale", 100], ["Boursorama", 100]]}, {"service": "Digital / Mobile banking", "peak": 100, "owner": "Monabanq", "whitespace": false, "top3": [["Monabanq", 100], ["Orange Bank", 100], ["N26", 100]]}, {"service": "Green / Sustainable finance", "peak": 48, "owner": "BNP Paribas", "whitespace": false, "top3": [["BNP Paribas", 48], ["Crédit Agricole", 2], ["Société Générale", 0]]}, {"service": "Private banking / Wealth management", "peak": 100, "owner": "HSBC France", "whitespace": false, "top3": [["HSBC France", 100], ["BNP Paribas", 68], ["Société Générale", 18]]}, {"service": "Consumer credit", "peak": 100, "owner": "Monabanq", "whitespace": false, "top3": [["Monabanq", 100], ["Orange Bank", 100], ["Boursorama", 100]]}, {"service": "Insurance & bancassurance", "peak": 100, "owner": "Crédit Agricole", "whitespace": false, "top3": [["Crédit Agricole", 100], ["Crédit Mutuel", 100], ["Fortuneo", 100]]}, {"service": "International / Expat banking", "peak": 100, "owner": "N26", "whitespace": false, "top3": [["N26", 100], ["Revolut", 100], ["HSBC France", 100]]}], "universe_size": 20}}, "services_fr": ["Crédit immobilier", "Banque des jeunes", "Banque des pros et PME", "Épargne et placement", "Banque digitale", "Finance verte et durable", "Banque privée", "Crédit à la consommation", "Assurance et bancassurance", "Banque internationale"], "services_short_fr": ["Immobilier", "Jeunes", "Pros/PME", "Épargne", "Digitale", "Verte", "Privée", "Conso", "Assurance", "International"]};
+let MODEL='gemini', HMZOOM=1, HMSORT=false, LANG='en';
+const MODELNAME={gemini:'Gemini 2.0 Flash',openai:'GPT-4o'};
+const CALLS={gemini:'2,500',openai:'2,500'};
+
+const T={
+ en:{
+  nav_study:'Study',nav_overview:'Overview',nav_method:'Methodology',nav_findings:'Findings',
+  nav_recall:'Layer 1 · Recall',nav_matrix:'Layer 2 · Territory Map',nav_ws:'White Space',nav_insights:'Key Findings',
+  introh:'Which French bank owns which <em>territory</em> in AI memory?',
+  introlede:'A GEO intelligence study mapping how large language models associate French banks with banking service territories — not what banks claim, but what the model has actually encoded.',
+  s1:'API calls, this model',s2:"banks in this model's universe",s3:'service territories mapped',
+  introbody:'This presentation covers <strong>$M</strong>. Use the toggle in the sidebar to switch between models — each is analysed independently, scoped to the banks <em>that model</em> recalls. The two are never blended; comparison across models is reserved for tier-matched future work.',
+  mh:'Methodology',mlede:'Two layers, two models, run independently. Each model is questioned on its own terms and analysed within its own recall universe.',
+  mpipe:'The pipeline',mnote:'A note on interpretation',
+  mnotebody:'What this measures is the model\'s <em>response behaviour</em> — a blend of encoded knowledge and generation habits — not a pure readout of "memory." Temperature was held at 0.2 for stability. Models were chosen for production relevance, not tier-matching.',
+  steps:[['Layer 1 · Unaided recall','500 identical calls per model: "List every French bank you know." Establishes parametric share of mind and defines each model\'s bank universe.'],
+         ['Universe selection','Each model\'s universe = its own top-recalled banks. Sizes differ by design — Gemini 10, GPT-4o 20 — because the models hold different depths of knowledge. That asymmetry is itself a finding.'],
+         ['Layer 2 · Territory association','One bank per prompt, 50 calls per bank: "Pick the top 3 service categories you associate with this bank." Near-100% parse success, no truncation.'],
+         ['Matrix & analysis','Association score 0–100 per bank × service = share of the 50 calls assigning that territory. Surfaces monopolies, contested zones, and white space.']],
+  rh:'Layer 1 · Unaided Recall',rlede:'How strongly each bank lives in the model\'s memory, unprompted. Bar = share of 500 calls that named the bank.',
+  xh:'Layer 2 · Territory Map',xlede:'Two views of the same data. The <strong>heatmap</strong> gives the exact ownership scores; the <strong>constellation</strong> below it shows the structure — which banks cluster around shared territory, which float alone.',
+  xhm:'Heatmap · exact association scores',xhmd:'Each cell: how often this model assigned a territory to a bank, across 50 calls. Brighter = stronger ownership. The mint dot marks each bank\'s primary territory.',
+  xc:'Constellation · ownership network',xcd:'The same scores as structure. Banks are <span style="color:var(--violet);font-weight:600">planets</span> sized by recall; the 10 service territories are <span style="color:var(--indigo);font-weight:600">anchors</span>. A line is drawn when a bank associates with a territory above the threshold — thicker = stronger. Drag nodes, hover a bank to isolate its ties, click a territory to see who orbits it. Push the threshold higher to thin the field.',
+  thr:'Edge threshold',resettle:'↻ Re-settle',sortbtn:'Sort by primary territory',
+  wh:'White Space',wlede:'Territories no bank strongly owns. The lower the peak association, the more open the field — a strategic opening for any brand willing to build the content.',
+  ih:'Key Findings',
+  inslede:'$M was asked to associate $N banks with 10 service territories, 50 times each. Here is what it revealed.',
+  f_ws:'White space: $S',f_ws_d:'No bank in $M\'s universe owns this territory — peak association just $P%, led weakly by $O. Open field for whoever builds the AI-visible content first.',
+  f_mono:'$O owns $S',f_mono_d:'$O is the runaway association for this territory at $P% — a near-monopoly in $M\'s memory.',
+  f_con:'Contested: $L',f_con_d:'Multiple banks cluster here with strong, similar scores — no single owner. $T all compete for $S.',
+  ws_led:'↳ white space · led only by $O',
+  legbank:'● bank',legterr:'◆ territory'
+ },
+ fr:{
+  nav_study:'Étude',nav_overview:'Vue d\'ensemble',nav_method:'Méthodologie',nav_findings:'Résultats',
+  nav_recall:'Couche 1 · Notoriété',nav_matrix:'Couche 2 · Carte des territoires',nav_ws:'Espace vacant',nav_insights:'Conclusions clés',
+  introh:'Quelle banque française possède quel <em>territoire</em> dans la mémoire des IA ?',
+  introlede:'Une étude d\'intelligence GEO cartographiant comment les grands modèles de langage associent les banques françaises aux territoires de services bancaires — non pas ce que les banques revendiquent, mais ce que le modèle a réellement encodé.',
+  s1:'appels API, ce modèle',s2:'banques dans l\'univers de ce modèle',s3:'territoires de services cartographiés',
+  introbody:'Cette présentation porte sur <strong>$M</strong>. Utilisez le sélecteur dans la barre latérale pour changer de modèle — chacun est analysé indépendamment, restreint aux banques <em>que ce modèle</em> rappelle. Les deux ne sont jamais fusionnés ; la comparaison inter-modèles est réservée à de futurs travaux à niveau équivalent.',
+  mh:'Méthodologie',mlede:'Deux couches, deux modèles, exécutés indépendamment. Chaque modèle est interrogé selon ses propres termes et analysé dans son propre univers de notoriété.',
+  mpipe:'Le pipeline',mnote:'Note d\'interprétation',
+  mnotebody:'Ce qui est mesuré ici est le <em>comportement de réponse</em> du modèle — un mélange de connaissances encodées et d\'habitudes de génération — et non une lecture pure de la « mémoire ». La température a été maintenue à 0,2 pour la stabilité. Les modèles ont été choisis pour leur pertinence en production, non pour leur appariement de niveau.',
+  steps:[['Couche 1 · Notoriété spontanée','500 appels identiques par modèle : « Listez toutes les banques françaises que vous connaissez. » Établit la part de mémoire paramétrique et définit l\'univers de banques de chaque modèle.'],
+         ['Sélection de l\'univers','L\'univers de chaque modèle = ses propres banques les plus rappelées. Les tailles diffèrent par conception — Gemini 10, GPT-4o 20 — car les modèles détiennent des profondeurs de connaissance différentes. Cette asymétrie est elle-même un résultat.'],
+         ['Couche 2 · Association de territoires','Une banque par requête, 50 appels par banque : « Choisissez les 3 catégories de services que vous associez à cette banque. » Taux d\'analyse proche de 100 %, sans troncature.'],
+         ['Matrice & analyse','Score d\'association 0–100 par banque × service = part des 50 appels attribuant ce territoire. Révèle les monopoles, les zones contestées et les espaces vacants.']],
+  rh:'Couche 1 · Notoriété spontanée',rlede:'À quel point chaque banque vit dans la mémoire du modèle, sans incitation. Barre = part des 500 appels ayant cité la banque.',
+  xh:'Couche 2 · Carte des territoires',xlede:'Deux vues des mêmes données. La <strong>heatmap</strong> donne les scores de possession exacts ; la <strong>constellation</strong> en dessous montre la structure — quelles banques se regroupent autour d\'un territoire partagé, lesquelles flottent seules.',
+  xhm:'Heatmap · scores d\'association exacts',xhmd:'Chaque cellule : à quelle fréquence ce modèle a attribué un territoire à une banque, sur 50 appels. Plus clair = possession plus forte. Le point menthe marque le territoire principal de chaque banque.',
+  xc:'Constellation · réseau de possession',xcd:'Les mêmes scores sous forme de structure. Les banques sont des <span style="color:var(--violet);font-weight:600">planètes</span> dimensionnées par notoriété ; les 10 territoires de services sont des <span style="color:var(--indigo);font-weight:600">ancres</span>. Une ligne est tracée quand une banque s\'associe à un territoire au-dessus du seuil — plus épaisse = plus forte. Déplacez les nœuds, survolez une banque pour isoler ses liens, cliquez un territoire pour voir qui gravite autour. Augmentez le seuil pour éclaircir le champ.',
+  thr:'Seuil de lien',resettle:'↻ Réorganiser',sortbtn:'Trier par territoire principal',
+  wh:'Espace vacant',wlede:'Territoires qu\'aucune banque ne possède fortement. Plus l\'association maximale est faible, plus le champ est ouvert — une opportunité stratégique pour toute marque prête à construire le contenu.',
+  ih:'Conclusions clés',
+  inslede:'$M a été sollicité pour associer $N banques à 10 territoires de services, 50 fois chacune. Voici ce que cela a révélé.',
+  f_ws:'Espace vacant : $S',f_ws_d:'Aucune banque de l\'univers de $M ne possède ce territoire — association maximale de seulement $P%, menée faiblement par $O. Champ ouvert pour qui construira le premier le contenu visible par les IA.',
+  f_mono:'$O possède $S',f_mono_d:'$O est l\'association dominante de ce territoire à $P% — un quasi-monopole dans la mémoire de $M.',
+  f_con:'Contesté : $L',f_con_d:'Plusieurs banques se regroupent ici avec des scores forts et similaires — aucun propriétaire unique. $T se disputent toutes $S.',
+  ws_led:'↳ espace vacant · mené uniquement par $O',
+  legbank:'● banque',legterr:'◆ territoire'
+ }
+};
+function L(k){return (T[LANG][k]!==undefined)?T[LANG][k]:T.en[k];}
+function svcLabels(){return LANG==='fr'?FBAPS_DATA.services_fr:FBAPS_DATA.services;}
+function svcShort(){return LANG==='fr'?FBAPS_DATA.services_short_fr:FBAPS_DATA.services_short;}
+function svcLabel(en){const i=FBAPS_DATA.services.indexOf(en);return i<0?en:svcLabels()[i];}
+function setLang(l){
+  LANG=l;
+  document.getElementById('lb-en').classList.toggle('on',l==='en');
+  document.getElementById('lb-fr').classList.toggle('on',l==='fr');
+  document.documentElement.lang=l;
+  applyStatic();
+  render();
+}
+function applyStatic(){
+  // nav
+  document.querySelectorAll('[data-k]').forEach(el=>{el.textContent=L(el.dataset.k);});
+  const set=(id,html)=>{const e=document.getElementById(id);if(e)e.innerHTML=html;};
+  set('t_introh',L('introh'));set('t_introlede',L('introlede'));
+  set('t_s1',L('s1'));set('t_s2',L('s2'));set('t_s3',L('s3'));
+  set('t_mh',L('mh'));set('t_mlede',L('mlede'));set('t_mpipe',L('mpipe'));
+  set('t_mnote',L('mnote'));set('t_mnotebody',L('mnotebody'));
+  set('t_rh',L('rh'));set('t_rlede',L('rlede'));
+  set('t_xh',L('xh'));set('t_xlede',L('xlede'));set('t_xhm',L('xhm'));set('t_xhmd',L('xhmd'));
+  set('t_xc',L('xc'));set('t_xcd',L('xcd'));
+  set('t_thr',L('thr'));set('t_resettle',L('resettle'));set('t_sortbtn',L('sortbtn'));
+  set('t_wh',L('wh'));set('t_wlede',L('wlede'));set('t_ih',L('ih'));
+  // pipeline steps
+  const steps=L('steps');
+  document.querySelectorAll('#t_steps .step').forEach((st,i)=>{
+    if(steps[i]){st.querySelector('.t').textContent=steps[i][0];st.querySelector('.d').textContent=steps[i][1];}
+  });
+}
+
+function color(v){
+  // light theme: near-white -> violet (#836FFF) -> deep indigo (#26035D)
+  if(v<=0)return '#f6f4fc';
+  const t=v/100;
+  let r,g,b;
+  if(t<0.5){const k=t/0.5; r=246+(131-246)*k; g=244+(111-244)*k; b=252+(255-252)*k;}
+  else{const k=(t-0.5)/0.5; r=131+(38-131)*k; g=111+(3-111)*k; b=255+(93-255)*k;}
+  return 'rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
+}
+function go(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  if(el){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));el.classList.add('active');}
+  window.scrollTo(0,0);
+}
+function setModel(m){
+  MODEL=m;
+  document.getElementById('mb-gemini').classList.toggle('on',m==='gemini');
+  document.getElementById('mb-openai').classList.toggle('on',m==='openai');
+  render();
+}
+function render(){
+  const d=FBAPS_DATA.models[MODEL];
+  document.getElementById('introtag').textContent=MODELNAME[MODEL];
+  document.getElementById('t_introbody').innerHTML=L('introbody').replace('$M',MODELNAME[MODEL]);
+  document.getElementById('s-calls').textContent=CALLS[MODEL];
+  document.getElementById('s-banks').textContent=d.banks.length;
+  // recall bars (sorted desc)
+  const rec=Object.entries(d.recall).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('recallbars').innerHTML=rec.map(([b,v])=>
+    '<div class="bar"><div class="nm">'+b+'</div><div class="track"><div class="fill" style="width:'+v+'%"></div></div><div class="pct">'+v.toFixed(0)+'%</div></div>').join('');
+  // whitespace bars (services by peak asc)
+  const svc=[...d.services_info].sort((a,b)=>a.peak-b.peak);
+  document.getElementById('wsbars').innerHTML=svc.map(s=>{
+    const ws=s.peak<40;
+    return '<div class="bar"><div class="nm">'+svcLabel(s.service)+'</div><div class="track"><div class="fill" style="width:'+s.peak+'%;background:'+(ws?'linear-gradient(90deg,#7a5a1a,var(--amber))':'linear-gradient(90deg,var(--indigo),var(--mint))')+'"></div></div><div class="pct">'+s.peak+'%</div></div>'
+      +(ws?'<div style="margin:-2px 0 10px 184px;font-size:12px;color:var(--amber)">'+L('ws_led').replace('$O',s.owner)+'</div>':'');
+  }).join('');
+  buildFindings(d);
+  buildHM(d);
+  buildNet(d);
+}
+function buildFindings(d){
+  const monos=d.services_info.filter(s=>s.peak>=90 && s.top3[1][1]<40);
+  const ws=d.services_info.filter(s=>s.peak<40);
+  const contested=d.services_info.filter(s=>s.top3.filter(t=>t[1]>=50).length>=3);
+  document.getElementById('inslede').textContent=L('inslede').replace('$M',MODELNAME[MODEL]).replace('$N',d.banks.length);
+  const sub=(str,m)=>{Object.keys(m).forEach(k=>str=str.split(k).join(m[k]));return str;};
+  let h='';
+  ws.forEach(s=>h+=finding('ws','◇',
+    sub(L('f_ws'),{'$S':svcLabel(s.service)}),
+    sub(L('f_ws_d'),{'$M':MODELNAME[MODEL],'$P':s.peak,'$O':s.owner})));
+  monos.slice(0,4).forEach(s=>h+=finding('mono','●',
+    sub(L('f_mono'),{'$O':s.owner,'$S':svcLabel(s.service)}),
+    sub(L('f_mono_d'),{'$O':s.owner,'$P':s.peak,'$M':MODELNAME[MODEL]})));
+  if(contested.length)h+=finding('con','◆',
+    sub(L('f_con'),{'$L':contested.map(s=>svcLabel(s.service)).join(', ')}),
+    sub(L('f_con_d'),{'$T':contested[0].top3.map(t=>t[0]).join(', '),'$S':svcLabel(contested[0].service)}));
+  document.getElementById('findings').innerHTML=h;
+}
+function finding(c,ic,t,d){return '<div class="find '+c+'"><div class="ic">'+ic+'</div><div><div class="ft">'+t+'</div><div class="fd">'+d+'</div></div></div>';}
+function buildHM(d){
+  let banks=d.banks.map((b,i)=>i);
+  if(HMSORT){const prim=d.banks.map((b,i)=>FBAPS_DATA.services.indexOf(d.primary[b]));banks.sort((a,b)=>prim[a]-prim[b]);}
+  const sh=svcShort();
+  let t='<table class="hm" style="zoom:'+(1+HMZOOM*0.18)+'"><thead><tr><th class="rowh"></th>';
+  sh.forEach(s=>t+='<th><div class="rot">'+s+'</div></th>');
+  t+='</tr></thead><tbody>';
+  banks.forEach(bi=>{
+    const b=d.banks[bi];const primIdx=FBAPS_DATA.services.indexOf(d.primary[b]);
+    t+='<tr><th class="rowh">'+b+'</th>';
+    d.matrix[bi].forEach((v,si)=>{
+      t+='<td class="cell'+(si===primIdx?' peak':'')+'" style="background:'+color(v)+';color:'+(v>50?'#ffffff':'#7c75a0')+'" data-b="'+b+'" data-s="'+svcLabels()[si]+'" data-v="'+v+'">'+(v>0?v:'')+'</td>';
+    });
+    t+='</tr>';
+  });
+  t+='</tbody></table>';
+  document.getElementById('hm').innerHTML=t;
+  document.querySelectorAll('.cell').forEach(c=>{
+    c.onmousemove=e=>{const tip=document.getElementById('tip');tip.style.opacity=1;
+      tip.style.left=Math.min(e.clientX+14,window.innerWidth-260)+'px';tip.style.top=(e.clientY+14)+'px';
+      tip.innerHTML='<div class="tb">'+c.dataset.b+'</div>'+c.dataset.s+'<br><span class="mono" style="color:#b9a9ff">'+c.dataset.v+(LANG==='fr'?'% d\'association':'% association')+'</span>';};
+    c.onmouseleave=()=>document.getElementById('tip').style.opacity=0;
+  });
+}
+function zoomHM(d){if(d===0)HMZOOM=1;else HMZOOM=Math.max(-2,Math.min(4,HMZOOM+d));buildHM(FBAPS_DATA.models[MODEL]);}
+function sortHM(){HMSORT=!HMSORT;buildHM(FBAPS_DATA.models[MODEL]);}
+
+/* ===== CONSTELLATION (force-directed) ===== */
+let NET={nodes:[],edges:[],raf:null,drag:null,hover:null,sel:null,thr:50};
+const cv=()=>document.getElementById('net'), cx=()=>cv().getContext('2d');
+function buildNet(d){
+  cancelAnimationFrame(NET.raf);
+  const W=1000,H=620;
+  const svc=FBAPS_DATA.services, ssh=svcShort();
+  const terr=svc.map((s,i)=>{
+    const a=(i/svc.length)*Math.PI*2 - Math.PI/2;
+    return {id:'t'+i,type:'t',label:ssh[i],full:s,
+      x:W/2+Math.cos(a)*330, y:H/2+Math.sin(a)*250, r:9};
+  });
+  const maxRec=Math.max(...Object.values(d.recall),1);
+  const banks=d.banks.map((b,i)=>({
+    id:'b'+i,type:'b',label:b,bi:i,
+    x:W/2+(Math.random()-.5)*200, y:H/2+(Math.random()-.5)*160,
+    r:7+13*Math.sqrt((d.recall[b]||1)/maxRec), recall:d.recall[b]||0
+  }));
+  const nodes=[...terr,...banks];
+  const byId={}; nodes.forEach(n=>byId[n.id]=n);
+  const edges=[];
+  banks.forEach((bn)=>{ d.matrix[bn.bi].forEach((v,si)=>{ if(v>0) edges.push({a:bn.id,b:'t'+si,v:v}); }); });
+  NET={...NET,nodes,edges,byId,W,H};
+  simLoop();
+}
+function simLoop(){
+  const {nodes,edges,byId,W,H}=NET; const thr=NET.thr;
+  for(let it=0;it<2;it++){
+    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const a=nodes[i],b=nodes[j];let dx=a.x-b.x,dy=a.y-b.y;let dist=Math.hypot(dx,dy)||1;
+      const rep=(a.type==='t'&&b.type==='t')?9000:5200;
+      const f=rep/(dist*dist); dx/=dist;dy/=dist;
+      if(a.type==='b'){a.x+=dx*f;a.y+=dy*f;} if(b.type==='b'){b.x-=dx*f;b.y-=dy*f;}
+    }
+    edges.forEach(e=>{ if(e.v<thr)return;
+      const a=byId[e.a],b=byId[e.b];let dx=b.x-a.x,dy=b.y-a.y;let dist=Math.hypot(dx,dy)||1;
+      const target=120-(e.v-thr)*0.6; const k=0.0009*(e.v/100);
+      const f=(dist-target)*k; dx/=dist;dy/=dist;
+      if(a.type==='b'){a.x+=dx*f*dist;a.y+=dy*f*dist;}
+    });
+    nodes.forEach(n=>{ if(n.type!=='b')return;
+      n.x+=(W/2-n.x)*0.0012; n.y+=(H/2-n.y)*0.0012;
+      n.x=Math.max(n.r,Math.min(W-n.r,n.x)); n.y=Math.max(n.r,Math.min(H-n.r,n.y));
+    });
+  }
+  drawNet();
+  NET.raf=requestAnimationFrame(simLoop);
+}
+function drawNet(){
+  const {nodes,edges,byId,W,H}=NET; const c=cx(); const thr=NET.thr;
+  c.clearRect(0,0,W,H);
+  edges.forEach(e=>{ if(e.v<thr)return;
+    const a=byId[e.a],b=byId[e.b];
+    let active=true;
+    if(NET.hover){active=(e.a===NET.hover);}
+    if(NET.sel){active=(e.b===NET.sel);}
+    const g=c.createLinearGradient(a.x,a.y,b.x,b.y);
+    g.addColorStop(0,'rgba(131,111,255,'+(active?0.85:0.12)+')');
+    g.addColorStop(1,'rgba(38,3,93,'+(active?0.85:0.12)+')');
+    c.strokeStyle=g; c.lineWidth=active?(0.6+e.v/22):(0.4+e.v/60);
+    c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
+  });
+  nodes.filter(n=>n.type==='t').forEach(n=>{
+    const on=!NET.sel||NET.sel===n.id||edgesTouch(n.id);
+    c.fillStyle=NET.sel===n.id?'#26035D':'rgba(38,3,93,'+(on?1:.28)+')';
+    c.beginPath();
+    c.moveTo(n.x,n.y-n.r);c.lineTo(n.x+n.r,n.y);c.lineTo(n.x,n.y+n.r);c.lineTo(n.x-n.r,n.y);c.closePath();c.fill();
+    c.fillStyle=on?'#26035D':'rgba(120,124,140,.4)';c.font='700 11px "DM Sans",sans-serif';c.textAlign='center';
+    c.fillText(n.label,n.x,n.y-n.r-7);
+  });
+  nodes.filter(n=>n.type==='b').forEach(n=>{
+    const on=!NET.hover||NET.hover===n.id;
+    const hl=NET.hover===n.id||(NET.sel&&edgeExists(n.id,NET.sel));
+    c.beginPath();c.arc(n.x,n.y,n.r,0,7);
+    c.fillStyle=hl?'#6a54f0':'rgba(131,111,255,'+(on?.92:.22)+')';c.fill();
+    c.strokeStyle='rgba(255,255,255,.95)';c.lineWidth=2;c.stroke();
+    if(n.r>15||hl||NET.hover===n.id){
+      c.font='600 11px IBM Plex Sans';c.textAlign='center';
+      const ly=n.y+n.r+13; const tw=c.measureText(n.label).width;
+      c.fillStyle='rgba(255,255,255,.9)'; c.fillRect(n.x-tw/2-3,ly-9,tw+6,13);
+      c.font='600 11px "DM Sans",sans-serif'; c.fillStyle=on?'#26035D':'rgba(150,154,170,.5)'; c.fillText(n.label,n.x,ly);
+    }
+  });
+}
+function edgeExists(b,t){return NET.edges.some(e=>e.a===b&&e.b===t&&e.v>=NET.thr);}
+function edgesTouch(tid){return NET.edges.some(e=>e.b===tid&&e.v>=NET.thr);}
+function netInit(){
+  const cvs=cv();
+  function pos(ev){const r=cvs.getBoundingClientRect();return {x:(ev.clientX-r.left)*(NET.W/r.width),y:(ev.clientY-r.top)*(NET.H/r.height)};}
+  function pick(p){return NET.nodes.find(n=>Math.hypot(n.x-p.x,n.y-p.y)<n.r+4);}
+  cvs.onmousedown=e=>{const n=pick(pos(e));if(n){NET.drag=n;NET.dragMoved=false;}};
+  cvs.onmousemove=e=>{const p=pos(e);
+    if(NET.drag){NET.drag.x=p.x;NET.drag.y=p.y;NET.dragMoved=true;return;}
+    const n=pick(p); NET.hover=(n&&n.type==='b')?n.id:null;
+    cvs.style.cursor=n?'pointer':'default';
+  };
+  cvs.onmouseup=e=>{const p=pos(e);const n=pick(p);
+    if(n&&n.type==='t'&&!NET.dragMoved){ NET.sel=(NET.sel===n.id)?null:n.id; }
+    NET.drag=null;
+  };
+  cvs.onmouseleave=()=>{NET.hover=null;NET.drag=null;};
+  document.getElementById('thr').oninput=e=>{NET.thr=+e.target.value;document.getElementById('thrval').textContent='≥'+e.target.value+'%';};
+}
+function restartSim(){buildNet(FBAPS_DATA.models[MODEL]);}
+
+applyStatic();
+render();
+netInit();
+</script>
+</body>
+</html>
